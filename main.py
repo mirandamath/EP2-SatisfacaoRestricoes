@@ -102,6 +102,6 @@ if __name__ == "__main__":
         print(resposta)
         for chave, valor in resposta.items():
             print(f"Hora {valor}: {chave}")
-    
+
 
     
