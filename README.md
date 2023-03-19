@@ -1,5 +1,6 @@
 # EP2-SatisfacaoRestricoes
 
+
 ##### Suponha que um laboratório de química precisa organizar o uso de seus equipamentos para garantir que todas as análises necessárias possam ser realizadas dentro do prazo esperado e que as restrições de segurança e capacidade dos equipamentos sejam cumpridas. O laboratório possui um conjunto de equipamentos, como balanças, espectrômetros e microscópios, que são usados para realizar diferentes tipos de análises químicas.
 
 ##### Existem várias análises que precisam ser realizadas, cada uma com seus próprios requisitos de equipamentos e tempo de execução. Alguns equipamentos só podem ser usados para uma análise específica, enquanto outros podem ser compartilhados entre diferentes análises.
@@ -43,6 +44,11 @@
 | Microscópio | 6 horas |
 
 ### Para gerenciarmos onde e em qual horário cada Equipamento será usado usamos BackTracking junto as restrições que criamos
+
+# Modelando o problema
+ 
+ 
+#### Decidimos modelar nossa variáveis como sendo o conjunto das Analises com seus respectivos equipamentos de modo que cada variavel é uma string que concatena uma analise e um equipamento e nosso dominio são os horários de uso
 
 
 # Resultado do Algoritmo de BackTracking
