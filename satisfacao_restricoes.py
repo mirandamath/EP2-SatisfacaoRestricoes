@@ -18,7 +18,7 @@ class SatisfacaoRestricoes():
   def adicionar_restricao(self, restricao):
     for variavel in restricao.variaveis:
       if variavel not in self.variaveis:
-        raise LookupError(f"Variável {variavel} não definida previamente")
+        raise LookupError("Variável não definida previamente")
       else:
         self.restricoes[variavel].append(restricao)
 

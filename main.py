@@ -1,84 +1,107 @@
 import numpy as np
 from satisfacao_restricoes import Restricao, SatisfacaoRestricoes
 
-def setEquip(variavel : dict, nome, maxHoras):
-    horas = []
-    for i in range(1, maxHoras + 1):
-        horas.append("Hora" + str(i))
-    variavel[nome] = horas
+'''
+    Abreviações dos equipamentos
+    Espectrofotômetro UV-VIS = EV
+    Cromatógrafo Gasoso = CG
+    Cromatógrafo Líquido = CL
+    Espectrômetro Infravermelho = IR
+    Microscópio = MP
+    Balança Analítica = BA
+    Espectrômetro de Massa = EM
+    Agitador Magnético = AM
+'''
 
-# Restringe qual analise eh usada no equipamento
-def alteraDominioDaVariavel(dominio : dict, variavel, analise):
-    dominio[variavel] = analise
-
-class RestricaoChecaDominio(Restricao):
-    def __init__(self, variavel, dominio):
-        super().__init__(variavel)
-        self.variavel = variavel
-        self.dominio = dominio
-    
-    def esta_satisfeita(self, atribuicao):
-        if str(atribuicao.keys()) not in self.dominio:
-            return False
-        return True
-
-class RestringeEquip(Restricao):
-    def __init__(self, variavel, dominio):
-        super().__init__([variavel])
-        self.variavel = variavel
-        self.dominio = dominio
+class conflitoEquipamento(Restricao):
+    def __init__(self, variavel_1, variavel_2):
+        super().__init__([variavel_1, variavel_2])
+        self.variavel_1 = variavel_1
+        self.variavel_2 = variavel_2
 
     def esta_satisfeita(self, atribuicao):
-        # se nenhuma analise ja esta usando esse horario do equipamento
-        if self.variavel not in atribuicao:
+        # atribuindo dois valores diferentes para analises que n podem estar em uma msm hora
+        if  self.variavel_1 not in atribuicao or self.variavel_2 not in atribuicao:
             return True
-        # 
-        # animais que não devem estar na mesma jaula
-        return atribuicao[self.variavel] != atribuicao[self.estado2]
-
+        return atribuicao[self.variavel_1] != atribuicao[self.variavel_2]
+    
 if __name__ == "__main__":
 
-    equipamentos = {}
+    variaveis = []
 
-    setEquip(equipamentos, "Balanca Analitica", 6)
-    setEquip(equipamentos, "Agitador Magnetico", 4)
-    setEquip(equipamentos, "Cromatografo Liquido", 8)
-    setEquip(equipamentos, "Cromatografo Gasoso", 6)
-    setEquip(equipamentos, "Espectrofotometor UV-VIS", 4)
-    setEquip(equipamentos, "Espectrometro Infravermelho", 6)
-    setEquip(equipamentos, "Espectrometro de Massa", 4)
-    setEquip(equipamentos, "Microscopio", 6)
+    equipamentos = []
+
+    analises = {"Analise01" : ["EV", "CG"],
+                "Analise02" : ["CL" , "IR"],
+                "Analise03" : ["MP", "BA"],
+                "Analise04" : ["EM"],
+                "Analise05" : ["AM", "IR"],
+                "Analise06" : ["CL" , "EV"],
+                "Analise07" : ["EV", "MP"],
+                "Analise08" : ["CG"],
+                "Analise09" : ["IR", "BA"],
+                "Analise10" : ["EM" , "CG"]                
+                }
+    
+    for analise, valor in analises.items():
+        for equipamento in valor:
+            variaveis.append(analise + "-" + equipamento)
+            if equipamento not in equipamentos:
+                equipamentos.append(equipamento)
 
     dominio = {}
-    # for var in equipamentos:
-    #     dominio[var] = np.array(["Analise1-Hora1", "Analise1-Hora2","Análise2-Hora1","Análise2-Hora2","Análise2-Hora3", "Análise3-Hora1","Análise3-Hora2","Análise4-Hora1","Análise5-Hora1", "Análise5-Hora2","Análise5-Hora3", "Análise6-Hora1", "Análise6-Hora2","Análise7-Hora1","Análise7-Hora2", "Análise8-Hora1","Análise9-Hora1","Análise9-Hora2", "Análise10-Hora1","Análise10-Hora2"])
 
-    alteraDominioDaVariavel(dominio, "Balanca Analitica", ["Analise3", "Analise9"])
-    alteraDominioDaVariavel(dominio, "Agitador Magnetico", ["Analise5"])
-    alteraDominioDaVariavel(dominio, "Cromatografo Liquido", ["Analise2", "Analise6"])
-    alteraDominioDaVariavel(dominio, "Cromatografo Gasoso", ["Analise1", "Analise8", "Analise10"])
-    alteraDominioDaVariavel(dominio, "Espectrofotometor UV-VIS", ["Analise1", "Analise6", "Analise7"])
-    alteraDominioDaVariavel(dominio, "Espectrometro Infravermelho", ["Analise2" , "Analise5", "Analise9"])
-    alteraDominioDaVariavel(dominio, "Espectrometro de Massa", ["Analise4", "Analise10"])
-    alteraDominioDaVariavel(dominio, "Microscopio", ["Analis3", "Analise7"])
+    for variavel in variaveis:
+        dominio[variavel] = [1,2,3,4,5,6,7,8]
 
-    problema = SatisfacaoRestricoes(equipamentos, dominio)
-
-    problema.adicionar_restricao(RestricaoChecaDominio(["Balanca Analitica"], dominio))
-
-    print(dominio)
+    problema = SatisfacaoRestricoes(variaveis, dominio)
     
-    # problema.adicionar_restricao(RestringeEquip(variaveis[0], "Analise3-Hora2"))
-    # problema.adicionar_restricao(RestringeEquip(variaveis[0], "Analise9-Hora2"))
-
-    # print dominios das variaveis
-    # for variavel in problema.restricoes:
-    #     for i in range(len(problema.restricoes[variavel])):
-    #         print(problema.restricoes[variavel][i].dominio)
+    #restringindo para horarios diferentes analises conflitantes
+    problema.adicionar_restricao(conflitoEquipamento('Analise01-EV', 'Analise07-EV'))
+    problema.adicionar_restricao(conflitoEquipamento('Analise01-EV', 'Analise06-EV'))
     
+    problema.adicionar_restricao(conflitoEquipamento('Analise01-EV', 'Analise01-CG'))
+    
+    problema.adicionar_restricao(conflitoEquipamento('Analise01-CG', 'Analise08-CG'))
+    problema.adicionar_restricao(conflitoEquipamento('Analise01-CG', 'Analise10-CG'))
+    
+    problema.adicionar_restricao(conflitoEquipamento('Analise02-CL', 'Analise06-CL'))
+    problema.adicionar_restricao(conflitoEquipamento('Analise02-CL', 'Analise02-IR'))
+    
+    problema.adicionar_restricao(conflitoEquipamento('Analise02-IR', 'Analise05-IR'))
+    problema.adicionar_restricao(conflitoEquipamento('Analise02-IR', 'Analise09-IR'))
+    
+    problema.adicionar_restricao(conflitoEquipamento('Analise03-MP', 'Analise07-MP'))
+    problema.adicionar_restricao(conflitoEquipamento('Analise03-MP', 'Analise03-BA'))
+    
+    problema.adicionar_restricao(conflitoEquipamento('Analise03-BA', 'Analise09-BA'))
+
+    problema.adicionar_restricao(conflitoEquipamento('Analise04-EM', 'Analise10-EM'))
+    
+    problema.adicionar_restricao(conflitoEquipamento('Analise05-IR', 'Analise09-IR'))
+
+    problema.adicionar_restricao(conflitoEquipamento('Analise05-AM', 'Analise05-IR'))
+
+    problema.adicionar_restricao(conflitoEquipamento('Analise06-EV', 'Analise07-EV'))
+    problema.adicionar_restricao(conflitoEquipamento('Analise06-EV', 'Analise06-CL'))
+    
+    problema.adicionar_restricao(conflitoEquipamento('Analise07-EV', 'Analise07-MP'))
+    
+    problema.adicionar_restricao(conflitoEquipamento('Analise08-CG', 'Analise10-CG'))
+    
+    problema.adicionar_restricao(conflitoEquipamento('Analise09-IR', 'Analise09-BA'))
+
+    problema.adicionar_restricao(conflitoEquipamento('Analise10-EM', 'Analise10-CG'))
+
+
     resposta = problema.busca_backtracking()
+
+    if resposta is None:
+        print("Nenhuma resposta encontrada")
+    else:
+        print(resposta)
+        for chave, valor in resposta.items():
+            print(f"Hora {valor}: {chave}")
     
-    # if resposta is None:
-    #     print("Nenhuma resposta encontrada")
-    # else:
-    #     print(resposta)
+
+    
