@@ -47,5 +47,6 @@
 
 # Resultado do Algoritmo de BackTracking
 
+As linhas horrespondem aos equipamento, as colunas as Horas que foram necessários para o plano de uso das analises e as células correspondem as análises
 
 ![image](https://user-images.githubusercontent.com/80297874/226154047-5cf485d6-26df-4cac-957e-32b6dffef54e.png)
